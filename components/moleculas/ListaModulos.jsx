@@ -1,15 +1,55 @@
 import styled from "styled-components";
 import { useGlobalStore } from "../../store/GlobalStore";
 import { useEffect, useState } from "react";
-export function ListaModulos({setCheckboxs,checkboxs}) {
+import { usePermisosStore } from "../../store/PermisosStore";
+export function ListaModulos({ setCheckboxs, checkboxs,accion }) {
   const { datamodulos } = useGlobalStore();
+  const { datapermisosEdit } = usePermisosStore();
   const [isChecked, setisChecked] = useState(true);
   const [select, setSelect] = useState([]);
+  const [nuevadata, setnuevadata] = useState([]);
+  
+  console.log(select);
+  useEffect(() => {
+    if (accion=="Editar"){
+       let allDocs = [];
+    datamodulos.map((element) => {
+      const statePermiso = datapermisosEdit?.some((objeto) =>
+        objeto.modulos.nombre.includes(element.nombre)
+      );
+      if (statePermiso) {
+        allDocs.push({ ...element, check: true  });
+      } else {
+        allDocs.push({ ...element, check: false });
+      }
+    });
+    console.log("nueva",datapermisosEdit)
+    setCheckboxs(allDocs)
 
+    }
+    else{
+      setCheckboxs(datamodulos)
+    }
+   
+    // setCheckboxs(datapermisosEdit)
+    // console.log(checkboxs)
+    // let allDocs = [];
+    // datamodulos.map((element) => {
+    //   const statePermiso = datapermisosEdit.some((objeto) =>
+    //     objeto.modulos.nombre.includes(element.nombre)
+    //   );
+    //   if (statePermiso) {
+    //     allDocs.push({ ...element, check: true });
+    //   } else {
+    //     allDocs.push({ ...element, check: false });
+    //   }
+    // });
+    // setnuevadata(allDocs)
+    // console.log("nuevas", allDocs);
+  }, [datapermisosEdit]);
   function handlecheckbox(id) {
-
     setCheckboxs((prev) => {
-      return prev.map((item) => {
+      return prev?.map((item) => {
         if (item.id === id) {
           return { ...item, check: !item.check };
         } else {
@@ -17,27 +57,25 @@ export function ListaModulos({setCheckboxs,checkboxs}) {
         }
       });
     });
-   
-    console.log(checkboxs);
+
+     console.log("checkboxes",checkboxs);
   }
   const seleccionar = (e) => {
     let check = e.target.checked;
-
     setisChecked(check);
   };
 
   return (
     <Container>
-      {datamodulos.map((item, index) => {
+      {checkboxs?.map((item, index) => {
         return (
-          <div className="content" onClick={() => handlecheckbox(item.id)}>
+          <div key={index} className="content" onClick={() => handlecheckbox(item.id)}>
             <input
               onChange={(e) => seleccionar(e)}
-              id={item.id}
-              value={item.nombre}
+              id={item.id}            
               type="checkbox"
               class="checkbox"
-              checked={checkboxs.check}
+              checked={item.check}
             />
             <span>{item.nombre}</span>
           </div>

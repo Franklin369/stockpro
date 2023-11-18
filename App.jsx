@@ -24,14 +24,14 @@ function App() {
   
   const {  dataempresa} = useEmpresaStore();
   const { pathname } = useLocation();
-  // const [theme, setTheme] = useState("dark");
-  const theme = dataempresa?.tema === "light" ? "light" : "dark";
+   const [themeuse, setTheme] = useState("dark");
+  const theme = themeuse === "light" ? "light" : "dark";
   const themeStyle = theme === "light" ? Light : Dark;
   const [sidebarOpen, setSidebarOpen] = useState(false);
    
   return (
     <>
-      <ThemeContext.Provider value={{ theme }}>
+      <ThemeContext.Provider value={{ theme,setTheme }}>
         <ThemeProvider theme={themeStyle}>
           <AuthContextProvider>
             {pathname != "/login" ? (

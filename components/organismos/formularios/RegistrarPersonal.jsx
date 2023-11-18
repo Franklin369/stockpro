@@ -19,14 +19,24 @@ import {
   TipouserData,
   TipoDocData,
   useGlobalStore,
+  usePermisosStore,
 } from "../../../index";
 import { useForm } from "react-hook-form";
 import { CirclePicker } from "react-color";
 import Emojipicker from "emoji-picker-react";
 import { useEmpresaStore } from "../../../store/EmpresaStore";
 import { Device } from "../../../styles/breakpoints";
-export function RegistrarPersonal({ onClose, dataSelect, accion }) {
-  const { insertarUsuario } = useUsuariosStore();
+import { useQuery } from "@tanstack/react-query";
+import { queryClient } from "../../../main";
+import { QueryCache } from "@tanstack/react-query";
+
+export function RegistrarPersonal({
+  onClose,
+  dataSelect,
+  accion,
+  setdataSelect,
+}) {
+  const { insertarUsuario, editarusuario } = useUsuariosStore();
   const { dataempresa } = useEmpresaStore();
   const [stateMarca, setStateMarca] = useState(false);
   const [stateCategoria, setStateCategoria] = useState(false);
@@ -34,12 +44,19 @@ export function RegistrarPersonal({ onClose, dataSelect, accion }) {
   const [openRegistroCategoria, SetopenRegistroCategoria] = useState(false);
   const [subaccion, setAccion] = useState("");
   const { datamodulos } = useGlobalStore();
-  const [checkboxs, setCheckboxs] = useState(datamodulos);
+  const [checkboxs, setCheckboxs] = useState([]);
   const [tipouser, setTipouser] = useState({
     icono: "",
     descripcion: "empleado",
   });
   const [tipodoc, setTipodoc] = useState({ icono: "", descripcion: "dni" });
+  const { datapermisosEdit, mostrarPermisosEdit } = usePermisosStore();
+
+  const { isLoading } = useQuery({
+    queryKey: ["mostrarpermisosedit", { id_usuario: dataSelect.id }],
+    queryFn: () => mostrarPermisosEdit({ id_usuario: dataSelect.id }),
+    enabled: dataSelect.id != null,
+  });
 
   const {
     register,
@@ -49,42 +66,48 @@ export function RegistrarPersonal({ onClose, dataSelect, accion }) {
   } = useForm();
   async function insertar(data) {
     if (accion === "Editar") {
-      // const p = {
-      //   id: dataSelect.id,
-      //   descripcion: data.descripcion,
-      //   idmarca: marcaItemSelect.id,
-      //   stock: parseFloat(data.stock),
-      //   stock_minimo: parseFloat(data.stockminimo),
-      //   codigobarras: parseFloat(data.codigobarras),
-      //   codigointerno: data.codigointerno,
-      //   precioventa: parseFloat(data.precioventa),
-      //   preciocompra: parseFloat(data.preciocompra),
-      //   id_categoria: categoriaItemSelect.id,
-      //   id_empresa: dataempresa.id,
-      // };
-      // await editarProductos(p);
-      // onClose();
+      const p = {
+        id: dataSelect.id,
+        nombres: data.nombres,
+        nro_doc: data.nrodoc,
+        telefono: data.telefono,
+        direccion: data.direccion,
+        estado: "activo",
+        tipouser: tipouser.descripcion,
+        tipodoc: tipodoc.descripcion,
+       
+      };
+      await editarusuario(p, checkboxs, dataempresa.id);
+      // refetch()
+      onClose();
     } else {
       const p = {
         nombres: data.nombres,
+        correo: data.correo,
         nrodoc: data.nrodoc,
         telefono: data.telefono,
         direccion: data.direccion,
         estado: "activo",
         tipouser: tipouser.descripcion,
         tipodoc: tipodoc.descripcion,
-        id_empresa:dataempresa.id
+        id_empresa: dataempresa.id,
       };
       const parametrosAuth = {
         correo: data.correo,
         pass: data.pass,
       };
-      await insertarUsuario(parametrosAuth, p,checkboxs);
+      await insertarUsuario(parametrosAuth, p, checkboxs);
+
       onClose();
     }
   }
   useEffect(() => {
     if (accion === "Editar") {
+      setTipodoc({icono: "", descripcion: dataSelect.tipodoc})
+      setTipouser({
+        icono: "",
+        descripcion: dataSelect.tipouser,
+      })
       // selectMarca({ id: dataSelect.idmarca, descripcion: dataSelect.marca });
       // selectCategoria({
       //   id: dataSelect.id_categoria,
@@ -92,6 +115,9 @@ export function RegistrarPersonal({ onClose, dataSelect, accion }) {
       // });
     }
   }, []);
+  if (isLoading) {
+    return <span>cargando...</span>;
+  }
   return (
     <Container>
       <div className="sub-contenedor">
@@ -110,13 +136,15 @@ export function RegistrarPersonal({ onClose, dataSelect, accion }) {
           <section className="seccion1">
             <article>
               <InputText icono={<v.icononombre />}>
-                <input
-                  className="form__field"
+                <input 
+               
+                  disabled={accion === "Editar" ? true : false}
+                  className={accion==="Editar"?"form__field disabled":"form__field"}
                   defaultValue={dataSelect.correo}
                   type="text"
                   placeholder=""
                   {...register("correo", {
-                    required: true,
+                    required: accion==="Editar"?false:true,
                   })}
                 />
                 <label className="form__label">Correo</label>
@@ -124,22 +152,25 @@ export function RegistrarPersonal({ onClose, dataSelect, accion }) {
                 {errors.correo?.type === "required" && <p>Campo requerido</p>}
               </InputText>
             </article>
-            <article>
-              <InputText icono={<v.iconopass />}>
-                <input
-                  className="form__field"
-                  defaultValue={dataSelect.pass}
-                  type="text"
-                  placeholder=""
-                  {...register("pass", {
-                    required: true,
-                  })}
-                />
-                <label className="form__label">pass</label>
+            {accion != "Editar" ? (
+              <article>
+                <InputText icono={<v.iconopass />}>
+                  <input
+                    className="form__field"
+                    defaultValue={dataSelect.pass}
+                    type="text"
+                    placeholder=""
+                    {...register("pass", {
+                      required: true,
+                    })}
+                  />
+                  <label className="form__label">pass</label>
 
-                {errors.pass?.type === "required" && <p>Campo requerido</p>}
-              </InputText>
-            </article>
+                  {errors.pass?.type === "required" && <p>Campo requerido</p>}
+                </InputText>
+              </article>
+            ) : null}
+
             <article>
               <InputText icono={<v.icononombre />}>
                 <input
@@ -182,9 +213,8 @@ export function RegistrarPersonal({ onClose, dataSelect, accion }) {
             <article>
               <InputText icono={<v.iconostock />}>
                 <input
-                  step="0.01"
                   className="form__field"
-                  defaultValue={dataSelect.nrodoc}
+                  defaultValue={dataSelect.nro_doc}
                   type="number"
                   placeholder=""
                   {...register("nrodoc", {
@@ -255,6 +285,7 @@ export function RegistrarPersonal({ onClose, dataSelect, accion }) {
             </ContainerSelector>
             PERMISOS:🔑
             <ListaModulos
+              accion={accion}
               setCheckboxs={setCheckboxs}
               checkboxs={checkboxs}
               tipouser={tipouser}

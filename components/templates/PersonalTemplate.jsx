@@ -16,7 +16,7 @@ export function PersonalTemplate({data}) {
   return (
     <Container>
       {openRegistro && (
-        <RegistrarPersonal
+        <RegistrarPersonal setdataSelect={setdataSelect}
           dataSelect={dataSelect}
           onClose={() => SetopenRegistro(!openRegistro)}
           accion={accion}

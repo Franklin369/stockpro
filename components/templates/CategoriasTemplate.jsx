@@ -1,11 +1,9 @@
 import styled from "styled-components";
 import {
   Header,
-  ContentFiltros,
-  Btndesplegable,
+
   useOperaciones,
-  ListaMenuDesplegable,
-  DataDesplegableTipo,
+
   Btnfiltro,
   v,
   TablaCategorias,
@@ -16,8 +14,7 @@ import {
 import { useState } from "react";
 import vacioverde from "../../assets/vacioverde.json";
 import vaciorojo from "../../assets/vaciorojo.json";
-import estrellacuadro  from "../../assets/estrellacuadros.svg"
-import fondocuadros  from "../../assets/fondocuadros.svg"
+
 export function CategoriasTemplate({ data }) {
   const [openRegistro, SetopenRegistro] = useState(false);
   const [accion, setAccion] = useState("");

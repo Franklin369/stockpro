@@ -2,35 +2,63 @@ import styled from "styled-components";
 import fondocuadros from "../../assets/fondocuadros.svg";
 import { NavLink, Link, Outlet } from "react-router-dom";
 import { DataModulosConfiguracion } from "../../utils/dataEstatica";
+import { usePermisosStore } from "../../store/PermisosStore";
+import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Mensaje } from "../moleculas/Mensaje";
 export function ConfiguracionTemplate() {
+  const { datapermisos, compararPermisos } = usePermisosStore();
+  const [statePermiso, setStatePermiso] = useState(false);
+  // const {data,isLoading,error} = useQuery({queryKey:["comparar permsiso"],queryFn:()=>compararPermisos()})
+
+  // useEffect(() => {
+  //   compararPermisos();
+  //   // datapermisos.forEach((item) => {
+  //   //   let modulo = item.modulos.nombre;
+  //   //   console.log(modulo)
+  //   //   DataModulosConfiguracion.forEach((itemmodulos) => {
+  //   //     if (itemmodulos.title === modulo) {
+  //   //       itemmodulos.state = true;
+  //   //     } else {
+          
+  //   //     }
+  //   //   });
+  //   // });
+  // }, [datapermisos]);
+  // if (isLoading){
+  //   return <span>Cargando</span>
+  // }
+  // if(error){
+  //   return <span>error</span>
+  // }
   return (
     <Container>
      
       <div id="cards">
-      {
-      DataModulosConfiguracion.map((item,index)=>{
-        return(
-          <Link to={item.link} className="card" key={index}>
-          <div class="card-content">
-            <div class="card-image">
-              <img src={item.icono} />
-            </div>
+        {DataModulosConfiguracion.map((item, index) => {
+          return (
+            <Link to={item.state?item.link:""} className={item.state?"card": "card false"} key={index}>
 
-            <div class="card-info-wrapper">
-              <div class="card-info">
-                <i class="fa-duotone fa-unicorn"></i>
-                <div class="card-info-title">
-                  <h3>{item.title}</h3>
-                  <h4>{item.subtitle}</h4>
+              <Mensaje state ={item.state}/>
+              <div class="card-content">
+                <div class="card-image">
+                  <img src={item.icono} />
+                </div>
+       
+
+                <div class="card-info-wrapper">
+                  <div class="card-info">
+                    <i class="fa-duotone fa-unicorn"></i>
+                    <div class="card-info-title">
+                      <h3>{item.title}</h3>
+                      <h4>{item.subtitle}</h4>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </Link>
-        )
-      })
-     }
-       
+            </Link>
+          );
+        })}
       </div>
     </Container>
   );
@@ -43,7 +71,7 @@ const Container = styled.div`
   background-position: center;
   background-repeat: no-repeat, repeat;
   align-items: center;
-  background-color:  ${({ theme }) => theme.bgtotal};
+  background-color: ${({ theme }) => theme.bgtotal};
   display: flex;
   height: 100%;
   justify-content: center;
@@ -88,6 +116,16 @@ const Container = styled.div`
         }
       }
     }
+    &.false{
+      &:hover {
+      border: 1px solid red;
+      .card-image {
+        img {
+          filter: grayscale(0);
+        }
+      }
+    }
+    }
   }
 
   .card:hover::before {
@@ -108,7 +146,6 @@ const Container = styled.div`
   }
 
   .card::before {
-   
     z-index: 3;
   }
 
@@ -122,7 +159,7 @@ const Container = styled.div`
   }
 
   .card > .card-content {
-    background-color:  ${({ theme }) => theme.bgcards};
+    background-color: ${({ theme }) => theme.bgcards};
     border-radius: inherit;
     display: flex;
     flex-direction: column;
@@ -138,15 +175,14 @@ const Container = styled.div`
   h3,
   h4,
   span {
-    
-    color: ${({theme})=>theme.colorsubtitlecard};
+    color: ${({ theme }) => theme.colorsubtitlecard};
     font-family: "Rubik", sans-serif;
     font-weight: 600;
     margin: 0px;
   }
 
   i {
-    color:${({theme})=>theme.colorsubtitlecard};
+    color: ${({ theme }) => theme.colorsubtitlecard};
   }
 
   .card-image {
@@ -188,7 +224,7 @@ const Container = styled.div`
   }
 
   .card-info-title > h4 {
-    color: ${({theme})=>theme.colortitlecard};
+    color: ${({ theme }) => theme.colortitlecard};
     font-size: 0.85em;
     margin-top: 8px;
     font-weight: 500;
@@ -248,3 +284,4 @@ const Container = styled.div`
     bottom: 10px;
   }
 `;
+

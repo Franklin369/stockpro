@@ -20,12 +20,12 @@ export function Buscador({setBuscador,onFocus}) {
   );
 }
 const Container = styled.div`
-  background-color: #212222;
+  background-color: ${(props)=>props.theme.bg};
   border-radius: 10px;
   height: 60px;
   align-items: center;
   display: flex;
-  color: #fff;
+  color: ${(props)=>props.theme.text};
   border: 1px solid #414244;
   .content {
     padding: 15px;
@@ -43,7 +43,7 @@ const Container = styled.div`
       outline: none;
       background: none;
       border: 0;
-      color: #fff;
+      color: ${(props)=>props.theme.text};
     }
   }
 `;

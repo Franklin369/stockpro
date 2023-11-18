@@ -27,9 +27,9 @@ const Container = styled.div`
   input:-webkit-autofill:focus,
   input:-webkit-autofill:active {
     -webkit-background-clip: text;
-    -webkit-text-fill-color: #ffffff;
+    -webkit-text-fill-color: ${(props)=>props.theme.text};
     transition: background-color 5000s ease-in-out 0s;
-    box-shadow: inset 0 0 10px 10px #23232329;
+    
   }
   .form__field {
     font-family: inherit;
@@ -38,10 +38,18 @@ const Container = styled.div`
     border-bottom: 2px solid #9b9b9b;
     outline: 0;
     font-size: 17px;
-    color: #fff;
+    color: ${(props)=>props.theme.text};
     padding: 7px 0;
     background: transparent;
     transition: border-color 0.2s;
+    &.disabled{
+      color: #696969;
+      background: #2d2d2d;
+      border-radius:8px;
+      margin-top:8px;
+      border-bottom: 1px dashed #656565;
+
+    }
   }
 
   .form__field::placeholder {

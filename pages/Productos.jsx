@@ -7,8 +7,15 @@ import { SpinnerLoader } from "../components/moleculas/SpinnerLoader";
 import { ProductosTemplate } from "../components/templates/ProductosTemplate";
 import { useProductosStore } from "../store/ProductosStore";
 import { useMarcaStore } from "../store/MarcaStore";
-
+import { usePermisosStore,BloqueoPagina } from "../index";
 export function Productos() {
+  const { datapermisos } = usePermisosStore();
+  const statePermiso = datapermisos.some((objeto) =>
+  objeto.modulos.nombre.includes("Productos")
+);
+if (statePermiso == false) {
+  return <BloqueoPagina state={statePermiso} />;
+} 
   const {mostrarProductos,dataproductos,buscador,buscarProductos} = useProductosStore()
   const {mostrarCategorias} = useCategoriasStore()
   const {mostrarMarca} = useMarcaStore()
@@ -27,6 +34,7 @@ export function Productos() {
  if(error){
   return <span>Error...</span>
  }
+
   return (<>
 
     <ProductosTemplate data={dataproductos}/>

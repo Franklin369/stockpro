@@ -8,7 +8,7 @@ import {
   useAuthStore,
   useUsuariosStore,
 } from "../../index";
-import { queryClient } from "../../main";
+
 export function DataUser({ stateConfig }) {
   const { mostrarUsuarios, datausuarios, idusuario, setiduser } =
     useUsuariosStore();

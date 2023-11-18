@@ -7,6 +7,8 @@ import {
   InsertarPermisos,
   MostrarUsuariosTodos,
   InsertarAsignaciones,
+  Editarusuarios,
+  EliminarPermisos,
 } from "../index";
 
 export const useUsuariosStore = create((set, get) => ({
@@ -15,8 +17,8 @@ export const useUsuariosStore = create((set, get) => ({
     set({ datamoduloscheck: p });
   },
   idusuario: 0,
-  setiduser:()=>{
-set({idusuario:0})
+  setiduser: () => {
+    set({ idusuario: 0 });
   },
   datausuarios: [],
   datausuariosTodos: [],
@@ -39,6 +41,22 @@ set({idusuario:0})
     await EditarTemaMonedaUser(p);
     const { mostrarUsuarios } = get();
     set(mostrarUsuarios);
+  },
+  editarusuario: async (p, datacheckpermisos,idempresa) => {
+    
+    await Editarusuarios(p);
+    const { mostrarUsuariosTodos } = get();
+    await EliminarPermisos({id_usuario:p.id})
+    datacheckpermisos.forEach(async (item) => {
+      if (item.check) {
+        let parametrospermisos = {
+          id_usuario: p.id,
+          idmodulo: item.id,
+        };
+        await InsertarPermisos(parametrospermisos);
+      }
+    });
+    set(mostrarUsuariosTodos({_id_empresa:idempresa}));
   },
   insertarUsuarioAdmin: async (p) => {
     //creando el correo y pass
@@ -85,7 +103,10 @@ set({idusuario:0})
       tipouser: p.tipouser,
       tipodoc: p.tipodoc,
     });
-    await InsertarAsignaciones({id_empresa:p.id_empresa,id_usuario:dataUserNew.id})
+    await InsertarAsignaciones({
+      id_empresa: p.id_empresa,
+      id_usuario: dataUserNew.id,
+    });
     console.log("arroja", dataUserNew);
     datacheckpermisos.forEach(async (item) => {
       if (item.check) {

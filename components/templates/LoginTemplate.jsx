@@ -9,13 +9,22 @@ import {
   SpinnerLoader,
   RegistrarAdmin,
   supabase,
+  FooterLogin,
+ 
 } from "../../index";
+import {Device} from "../../styles/breakpoints"
 import estrellas from "../../assets/estrellasVarias.svg";
 import { useMutation } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import carrito from "../../assets/carrito.svg";
+import logo from "../../assets/inventarioslogo.png";
+import { MdOutlineInfo } from "react-icons/md";
+import { ThemeContext } from "../../App";
 export function LoginTemplate() {
+  const { setTheme, theme } = useContext(ThemeContext);
+  setTheme("light")
   const { insertarUsuario } = useUsuariosStore();
   const { signInWithEmail } = useAuthStore();
   const [state, setState] = useState(false);
@@ -32,7 +41,7 @@ export function LoginTemplate() {
       await insertarUsuario(p);
     },
   });
- const {
+  const {
     register,
     formState: { errors },
     handleSubmit,
@@ -49,25 +58,31 @@ export function LoginTemplate() {
       setStateInicio(!stateInicio);
     }
   }
- 
+
   return (
-    <div>
-     
-      <Container imgfondo={v.imagenfondo}>
-        <div className="contentCard">
+    <Container imgfondo={v.imagenfondo}>
+      <div className="contentLogo">
+        <img src={logo}></img>
+        <span>StockPRO</span>
+      </div>
+      <div className="bannerlateral">
+        <img src={carrito}></img>
+      </div>
+
+      <div className="contentCard">
+        <div className="card">
           {state && <RegistrarAdmin setState={() => setState(!state)} />}
 
-          <div className="contentImg">
-            <img src={v.logo} />
-          </div>
           <Titulo>StockPRO</Titulo>
           {stateInicio && (
             <TextoStateInicio>datos incorrectos</TextoStateInicio>
           )}
-
-          <p className="frase">
-            Controla tu inventario de forma facil y rapida.
-          </p>
+          <span className="ayuda">
+            {" "}
+            Puedes crear una cuenta nueva ó <br></br>solicitar a tu empleador
+            una. <MdOutlineInfo />
+          </span>
+          <p className="frase">Controla tu inventario.</p>
           <form onSubmit={handleSubmit(iniciar)}>
             <InputText icono={<v.iconoemail />}>
               <input
@@ -96,7 +111,7 @@ export function LoginTemplate() {
               {errors.pass?.type === "required" && <p>Campo requerido</p>}
             </InputText>
             <ContainerBtn>
-              <Btnsave  titulo="Iniciar" bgcolor="#fc6b32" />
+              <Btnsave titulo="Iniciar" bgcolor="#fc6b32" />
               <Btnsave
                 funcion={() => setState(!state)}
                 titulo="Crear cuenta"
@@ -105,35 +120,80 @@ export function LoginTemplate() {
             </ContainerBtn>
           </form>
         </div>
-      </Container>
-    </div>
+        <FooterLogin />
+      </div>
+    </Container>
   );
 }
 const Container = styled.div`
-  background-repeat: no-repeat;
   background-size: cover;
   height: 100vh;
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr;
   align-items: center;
   justify-content: center;
-  color: rgba(255, 255, 255, 0.87);
   text-align: center;
-  background-image: url(${estrellas});
-  background-color: #000;
+  background-color: #262626;
+  @media ${Device.tablet} {
+    grid-template-columns: 1fr 2fr;
+  }
+  .contentLogo {
+    position: absolute;
+    top: 15px;
+    font-weight: 700;
+    display: flex;
+    left: 15px;
+    align-items: center;
+    color: #fff;
 
+    img {
+      width: 50px;
+    }
+  }
+  .cuadros {
+    transition: cubic-bezier(0.4, 0, 0.2, 1) 0.6s;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    bottom: 0;
+    transition: 0.6s;
+  }
+
+  .bannerlateral {
+    background-color: #fc6b32;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    img {
+      width: 80%;
+    }
+  }
   .contentCard {
+    grid-column: 2;
+    background-color: #ffffff;
+    background-image: url(${estrellas});
+    background-size: cover;
+    z-index: 100;
     position: relative;
-    background: ${({ theme }) => theme.bgtotal};
-    border-radius: 20px;
     gap: 30px;
     display: flex;
-    flex-direction: column;
     padding: 20px;
-    margin: 20px;
     box-shadow: 8px 5px 18px 3px rgba(0, 0, 0, 0.35);
     justify-content: center;
     width: auto;
-    height: 80%;
+    height: 100%;
+    width: 100%;
+    align-items: center;
+    flex-direction: column;
+    justify-content: space-between;
+    .card {
+      padding-top: 80px;
+      width: 100%;
+      @media ${Device.laptop} {
+        width: 50%;
+      }
+    }
     .version {
       color: #727272;
       text-align: start;
@@ -150,8 +210,29 @@ const Container = styled.div`
       }
     }
     .frase {
-      color: #909090;
-      font-size: 1.2rem;
+      color: #fc6c32;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom:30px;
+    }
+    .ayuda {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      color: #8d8d8d;
+      font-size: 15px;
+      font-weight: 500;
+    }
+    &:hover {
+      .contentsvg {
+        top: -100px;
+        opacity: 1;
+      }
+      .cuadros {
+        transform: rotate(37deg) rotateX(5deg) rotateY(12deg) rotate(3deg)
+          skew(2deg) skewY(1deg) scaleX(1.2) scaleY(1.2);
+        color: red;
+      }
     }
   }
   @keyframes flotar {
@@ -171,7 +252,7 @@ const Titulo = styled.span`
   font-weight: 700;
 `;
 const ContainerBtn = styled.div`
-margin-top:15px;
+  margin-top: 15px;
   display: flex;
   justify-content: center;
 `;
